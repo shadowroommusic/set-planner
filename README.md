@@ -42,6 +42,7 @@ It never opens an audio file or a vendor database. It works purely on the track 
 
 ```sh
 python3 -m venv .venv
+.venv/bin/pip install -U pip
 .venv/bin/pip install -e .
 
 # Time an ordered set (16 second blends by default in this example)
