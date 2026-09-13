@@ -1,18 +1,39 @@
 {
   "name": "set-planner",
-  "version": "0.1.0",
-  "description": "Set timing and next-track recommendations for DJ sets",
-  "author": { "name": "Shadow Producers" },
+  "version": "0.2.0+codex.20260913133410",
+  "description": "Set \u8ba1\u65f6\u4e0e\u4e0b\u4e00\u9996\u63a8\u8350\uff08ShadowRoom Music\uff09",
+  "author": {
+    "name": "ShadowRoom Music",
+    "email": "support@shadowroom.cn",
+    "url": "https://shadowroom.cn"
+  },
+  "homepage": "https://shadowroom.cn",
+  "repository": "https://github.com/shadowroommusic",
   "license": "MIT",
-  "keywords": ["dj", "set-planning", "camelot", "bpm", "cue-points"],
+  "keywords": [
+    "dj",
+    "set-planning",
+    "camelot",
+    "bpm",
+    "cue-points",
+    "mcp",
+    "shadowroom"
+  ],
   "interface": {
     "displayName": "Set Planner",
-    "shortDescription": "Time your set and get explainable next-track picks.",
-    "longDescription": "Turns cue A/B data into a real set timeline: per-track segment durations, transition overlaps, phrasing warnings and the total runtime. It also ranks the next track by bpm (half and double time included), Camelot distance, genre overlap and energy change, and always explains the score.",
-    "developerName": "Shadow Producers",
+    "shortDescription": "\u7b97\u51c6 set \u65f6\u957f\uff0c\u5e76\u7ed9\u51fa\u80fd\u89e3\u91ca\u7406\u7531\u7684\u4e0b\u4e00\u9996\u63a8\u8350\u3002",
+    "longDescription": "\u628a cue A/B \u6570\u636e\u53d8\u6210\u771f\u5b9e\u7684 set \u65f6\u95f4\u8f74\uff1a\u6bcf\u9996\u7684\u6bb5\u843d\u65f6\u957f\u3001\u8fc7\u6e21\u91cd\u53e0\u3001\u4e50\u53e5\u4e0e\u901f\u5ea6\u63d0\u9192\u3001\u603b\u65f6\u957f\uff1b\u540c\u65f6\u6309 BPM\uff08\u542b half / double time\uff09\u3001Camelot \u8c03\u6027\u8ddd\u79bb\u3001\u98ce\u683c\u91cd\u5408\u5ea6\u4e0e\u80fd\u91cf\u5dee\u7ed9\u4e0b\u4e00\u9996\u6253\u5206\uff0c\u5e76\u9010\u6761\u8bf4\u660e\u7406\u7531\u3002",
+    "developerName": "ShadowRoom Music",
     "category": "Music",
-    "capabilities": ["set-timing", "track-recommendation", "harmonic-mixing"],
-    "defaultPrompt": "Time my set and suggest the next track."
+    "capabilities": [
+      "set-timing",
+      "track-recommendation",
+      "harmonic-mixing"
+    ],
+    "websiteURL": "https://shadowroom.cn/tools",
+    "logo": "./assets/icon.png",
+    "brandColor": "#0B0B0F",
+    "defaultPrompt": "\u7b97\u4e00\u4e0b\u6211\u8fd9\u4e2a set \u7684\u603b\u65f6\u957f\uff0c\u5e76\u63a8\u8350\u4e0b\u4e00\u9996\u653e\u4ec0\u4e48\u3002"
   },
   "mcpServers": "./.mcp.json"
 }

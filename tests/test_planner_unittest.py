@@ -1,11 +1,13 @@
 from __future__ import annotations
 
+import json
 import unittest
 
 from shadow_set_planner.keys import key_move, parse_key
 from shadow_set_planner.model import Track, parse_tracks
 from shadow_set_planner.recommend import bpm_match, energy_match, genre_match, suggest_from_payload, suggest_next
 from shadow_set_planner.timing import format_duration, plan_from_payload, plan_set, segment_for
+from shadow_set_planner import mcp_server
 
 
 def make_track(
@@ -255,6 +257,46 @@ class ParsingTests(unittest.TestCase):
         track = parse_tracks([{"id": "x", "title": "X", "cues": [{"name": "intro", "position_ms": 1000}, {"name": "outro", "position_ms": 2000}]}])[0]
         self.assertEqual(track.cue_a.position_ms, 1000)
         self.assertEqual(track.cue_b.position_ms, 2000)
+
+
+class McpProtocolTests(unittest.TestCase):
+    """The server must answer the way any MCP client expects, not just Codex."""
+
+    def test_ping_and_negotiation_methods_return_empty_results(self) -> None:
+        for method, expected in (
+            ("ping", {}),
+            ("resources/list", {"resources": []}),
+            ("resources/templates/list", {"resourceTemplates": []}),
+            ("prompts/list", {"prompts": []}),
+            ("logging/setLevel", {}),
+        ):
+            reply = mcp_server.handle({"jsonrpc": "2.0", "id": 1, "method": method, "params": {}})
+            self.assertEqual(reply["result"], expected, method)
+            self.assertNotIn("error", reply)
+
+    def test_tool_failure_is_reported_with_is_error(self) -> None:
+        reply = mcp_server.handle(
+            {"jsonrpc": "2.0", "id": 2, "method": "tools/call", "params": {"name": "plan_set", "arguments": {}}}
+        )
+        self.assertTrue(reply["result"]["isError"])
+        self.assertIn("plan_set needs", reply["result"]["content"][0]["text"])
+
+    def test_plan_set_tool_call_round_trip(self) -> None:
+        payload = {
+            "tracks": [
+                {
+                    "id": "a",
+                    "title": "A",
+                    "duration_ms": 300_000,
+                    "cues": [{"name": "A", "position_ms": 0}, {"name": "B", "position_ms": 300_000}],
+                }
+            ]
+        }
+        reply = mcp_server.handle(
+            {"jsonrpc": "2.0", "id": 3, "method": "tools/call", "params": {"name": "plan_set", "arguments": {"set": payload, "default_overlap_ms": 16000}}}
+        )
+        result = json.loads(reply["result"]["content"][0]["text"])
+        self.assertEqual(result["summary"]["total_duration"], "5:00")
 
 
 if __name__ == "__main__":

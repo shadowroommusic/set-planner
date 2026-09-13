@@ -3,14 +3,23 @@ requires = ["setuptools>=68"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "shadow-set-planner"
-version = "0.1.0"
-description = "Set timing from cue A/B segments and explainable next-track recommendations"
+name = "set-planner"
+version = "0.2.0"
+description = "Set 计时与下一首推荐（ShadowRoom Music）"
+readme = { file = "README.md", content-type = "text/markdown" }
 requires-python = ">=3.9"
+license = { text = "MIT" }
+keywords = ["dj", "set-planning", "camelot", "bpm", "mcp", "shadowroom"]
 dependencies = []
+
+[project.urls]
+Homepage = "https://shadowroom.cn"
+Tools = "https://shadowroom.cn/tools"
+Repository = "https://github.com/shadowroommusic"
 
 [project.scripts]
 shadow-set-planner = "shadow_set_planner.cli:main"
+shadow-set-planner-mcp = "shadow_set_planner.mcp_server:main"
 
 [tool.setuptools.packages.find]
 where = ["src"]

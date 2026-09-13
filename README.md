@@ -1,6 +1,6 @@
 # Set Planner
 
-This independent Shadow Producers plugin does the maths a DJ normally does in their head:
+This independent ShadowRoom Music plugin (a Shadow Producers tool) does the maths a DJ normally does in their head:
 
 1. **Time the set** — turn cue A/B data into per-track segment durations, transition overlaps, phrasing warnings and one total runtime.
 2. **Pick the next track** — rank candidates by bpm (half and double time included), Camelot distance, genre overlap and energy change, and explain every score.

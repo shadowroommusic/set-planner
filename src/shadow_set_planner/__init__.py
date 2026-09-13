@@ -1,3 +1,3 @@
-"""Set timing and next-track recommendations for Shadow Producers."""
+"""Set Planner — Set 计时与下一首推荐（ShadowRoom Music）。"""
 
-__version__ = "0.1.0"
+__version__ = "0.2.0"
