@@ -3,6 +3,8 @@
 An MCP server for the maths a DJ normally does in their head: **how long will this set run**, and
 **what should I play next**?
 
+Works with any MCP-compatible agent or client.
+
 [中文说明](README.zh-CN.md) · License: [AGPL-3.0](LICENSE)
 
 ## Features
