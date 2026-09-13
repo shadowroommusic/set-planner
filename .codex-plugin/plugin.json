@@ -1,0 +1,18 @@
+{
+  "name": "set-planner",
+  "version": "0.1.0",
+  "description": "Set timing and next-track recommendations for DJ sets",
+  "author": { "name": "Shadow Producers" },
+  "license": "MIT",
+  "keywords": ["dj", "set-planning", "camelot", "bpm", "cue-points"],
+  "interface": {
+    "displayName": "Set Planner",
+    "shortDescription": "Time your set and get explainable next-track picks.",
+    "longDescription": "Turns cue A/B data into a real set timeline: per-track segment durations, transition overlaps, phrasing warnings and the total runtime. It also ranks the next track by bpm (half and double time included), Camelot distance, genre overlap and energy change, and always explains the score.",
+    "developerName": "Shadow Producers",
+    "category": "Music",
+    "capabilities": ["set-timing", "track-recommendation", "harmonic-mixing"],
+    "defaultPrompt": "Time my set and suggest the next track."
+  },
+  "mcpServers": "./.mcp.json"
+}

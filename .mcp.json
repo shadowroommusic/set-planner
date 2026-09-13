@@ -1,0 +1,9 @@
+{
+  "mcpServers": {
+    "set-planner": {
+      "command": "python3",
+      "args": ["-m", "shadow_set_planner.mcp_server"],
+      "cwd": "${pluginRoot}"
+    }
+  }
+}
