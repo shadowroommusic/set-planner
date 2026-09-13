@@ -1,13 +1,61 @@
 # Set Planner
 
-This independent ShadowRoom Music plugin (a Shadow Producers tool) does the maths a DJ normally does in their head:
+An MCP server for the maths a DJ normally does in their head: **how long will this set run**, and
+**what should I play next**?
 
-1. **Time the set** — turn cue A/B data into per-track segment durations, transition overlaps, phrasing warnings and one total runtime.
-2. **Pick the next track** — rank candidates by bpm (half and double time included), Camelot distance, genre overlap and energy change, and explain every score.
+[中文说明](README.zh-CN.md) · License: [AGPL-3.0](LICENSE)
 
-It never opens an audio file or a vendor database. It works purely on the track JSON you give it, so it is safe to run against an exported library.
+## Features
 
-## JSON input
+- **Set timing.** Turns cue A/B points into per-track segments, transition overlaps, phrasing
+  warnings and one total runtime.
+- **Next-track suggestions.** Ranks candidates by bpm (half/double time included), key
+  compatibility, genre overlap and energy change — and explains every score.
+- **Nothing is opened.** It works purely on the track JSON you give it; no audio files, no
+  Rekordbox/Serato databases.
+- **Explainable.** Each suggestion comes with reasons, a score breakdown and cautions; each plan
+  comes with explicit warnings instead of silent guesses.
+
+## Requirements
+
+| | |
+| --- | --- |
+| OS | macOS, Linux or Windows |
+| Python | 3.9 or newer |
+| Runtime deps | none |
+
+## Install
+
+### As a Codex plugin
+
+```sh
+codex plugin marketplace add shadowroommusic/set-planner
+codex plugin add set-planner@shadowroom
+```
+
+### In any other MCP client
+
+```json
+{
+  "mcpServers": {
+    "set-planner": {
+      "command": "python3",
+      "args": ["mcp_server.py"],
+      "cwd": "/path/to/set-planner"
+    }
+  }
+}
+```
+
+### CLI only
+
+```sh
+python3 -m venv .venv
+.venv/bin/pip install -e .
+.venv/bin/shadow-set-planner --help
+```
+
+## Input format
 
 ```json
 {
@@ -15,7 +63,6 @@ It never opens an audio file or a vendor database. It works purely on the track 
     {
       "id": "track-1",
       "title": "Warehouse Tool",
-      "artist": "Someone",
       "bpm": 128,
       "key": "8A",
       "genres": ["techno", "melodic techno"],
@@ -33,56 +80,51 @@ It never opens an audio file or a vendor database. It works purely on the track 
 }
 ```
 
-- `cues` accepts `A`/`B` as well as `intro`/`outro`, `in`/`out`, `start`/`end`, and a `loop` cue with `end_ms`.
-- `key` accepts Camelot (`8A`) or musical notation (`A minor`, `Am`, `C`, `G#m`, `Db`).
-- `genres` accepts a list or a comma-separated string.
-- `transitions` is optional; `--overlap-ms` sets the default for every transition.
+`cues` accepts `A`/`B`, `intro`/`outro`, `in`/`out`, `start`/`end` and loop cues with `end_ms`;
+`key` accepts Camelot (`8A`) or musical notation (`A minor`, `Am`, `G#m`, `Db`); `genres` accepts a
+list or a comma-separated string; `transitions` is optional.
 
-## Commands
+## Tools
+
+| Tool | What it does |
+| --- | --- |
+| `plan_set` | Time an ordered set (`{"set": {...}, "default_overlap_ms": 16000}` or `{"input_path": "…"}`) |
+| `suggest_next` | Rank what to play next (`{"current": {...}, "pool": [...]}` or `{"library_path": "…", "current_id": "…"}`) |
+
+CLI equivalents: `shadow-set-planner plan` and `shadow-set-planner suggest`.
+
+## Usage
 
 ```sh
-python3 -m venv .venv
-.venv/bin/pip install -U pip
-.venv/bin/pip install -e .
-
-# Time an ordered set (16 second blends by default in this example)
+# time an ordered set (16 second blends here)
 .venv/bin/shadow-set-planner plan --input set.json --overlap-ms 16000 --output plan.json
 
-# What should follow the track that is playing now?
+# what should follow the track that is playing now?
 .venv/bin/shadow-set-planner suggest --library library.json --current track-1 --limit 5
 ```
 
-## What the plan reports
+`plan` reports a `timeline` (segments, play positions, cue points, overlaps), `transitions`,
+a `summary` (total runtime, segment sum, time saved by blending) and `warnings`. `suggest` reports
+ranked candidates with `reasons`, `breakdown` and `cautions`.
 
-- `timeline`: per track the segment (`start_ms`, `end_ms`, `duration_ms`, `bars`), where it plays in the set (`play_start`, `play_end`), its cue in/out points and the overlaps in and out.
-- `transitions`: overlap used, bpm change in percent, Camelot move and any warning.
-- `summary`: `total_duration` (h:mm) plus `sum_of_segments_ms` and `overlap_saved_ms`, so you can see exactly how much time the blends saved.
-- `warnings`: missing A/B cues, cue B before cue A, cue B past the track end, overlaps longer than the shorter segment, tempo jumps that need a pitch/tempo sync, harmonically distant moves and segments that are off the bar grid.
+## Safety
 
-## How the recommendation score works
+- Read-only and offline: no audio files or vendor databases are touched.
+- All input comes from the JSON you provide; plans and suggestions are just files (or stdout).
 
-| Component | Weight | Notes |
-| --- | --- | --- |
-| bpm | 0.35 | Full score within 0.8%. Half-time and double-time ratios count as a match. |
-| key | 0.25 | Same key 1.0, adjacent on the Camelot wheel 0.85, relative major/minor 0.7, +7 energy boost 0.6, distant 0.2. |
-| genre | 0.20 | Jaccard overlap of normalized genre tokens. |
-| energy | 0.20 | Steady or +1 is perfect, small steps slightly less, large jumps are penalised. |
+## Troubleshooting
 
-Every suggestion carries `reasons` (why it scored that way), `breakdown` (the four component scores) and `cautions` (what to watch out for). Unknown metadata never blocks a suggestion; it is reported and scored neutrally.
+| Symptom | What to do |
+| --- | --- |
+| “missing A/B cues” warnings | Add `cues` for the track, or plan without it (it falls back to full length). |
+| Suggestions look flat | Give tracks `energy`/`genres` metadata; unknown metadata is scored neutrally by design. |
+| Tempo jumps flagged | That warning means Beat Sync or pitch adjustment is needed at the transition. |
 
-## MCP
+## Contributing
 
-`.mcp.json` exposes two read-only tools:
-
-- `plan_set` — `{"set": {...}, "default_overlap_ms": 16000}` or `{"input_path": "/path/set.json"}`.
-- `suggest_next` — `{"current": {...}, "pool": [...]}` or `{"library_path": "/path/library.json", "current_id": "track-1"}`.
-
-## Tests
-
-```sh
-PYTHONPATH=src python3 -m unittest discover -s tests -v
-```
+See [CONTRIBUTING.md](CONTRIBUTING.md). Implementation notes live in
+[docs/internals.md](docs/internals.md).
 
 ## License
 
-MIT for this plugin, with no runtime dependency.
+AGPL-3.0 — see [LICENSE](LICENSE).
